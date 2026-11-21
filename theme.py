@@ -48,12 +48,15 @@ def build_css(key: str = DEFAULT_PALETTE, accent: str | None = None) -> str:
   --exam:{KIND['exam']}; --deadline:{KIND['deadline']}; --ann:{KIND['ann']}; --sched:{KIND['sched']}; --file:{KIND['file']};
 }}
 html, body, .stApp, [data-testid="stSidebar"], button, input, textarea {{font-family:'Cairo','Segoe UI',Tahoma,sans-serif !important}}
-.stApp {{direction:rtl; color:var(--text);
+.stApp {{color:var(--text);
   background:radial-gradient(900px 520px at 92% -8%, {rgba(A, .20)}, transparent 62%),
              radial-gradient(760px 460px at -6% 8%, {rgba(A2, .14)}, transparent 58%), var(--bg)}}
 [data-testid="stHeader"] {{background:transparent}}
 #MainMenu, footer {{visibility:hidden}}
-[data-testid="stSidebar"] {{direction:rtl; background:linear-gradient(180deg,var(--panel),var(--bg)); border-left:1px solid var(--border)}}
+/* الاتجاه من اليمين لليسار على المحتوى بس، مش على هيكل Streamlit: عشان القايمة الجانبية تتخبّى صح على الموبايل */
+[data-testid="stSidebar"] {{background:linear-gradient(180deg,var(--panel),var(--bg)); border-right:1px solid var(--border)}}
+[data-testid="stSidebar"][aria-expanded="false"] {{visibility:hidden}}
+[data-testid="stSidebarContent"], [data-testid="stSidebarUserContent"], .block-container {{direction:rtl; text-align:right}}
 .block-container {{max-width:1180px; padding-top:1.4rem}}
 h1,h2,h3 {{letter-spacing:0}}
 
@@ -134,8 +137,51 @@ h1,h2,h3 {{letter-spacing:0}}
 .cm-pill.done {{opacity:.45; text-decoration:line-through}}
 .cm-more {{color:var(--muted); font-size:.75rem; text-align:center}}
 mark {{background:#facc15; color:#111; border-radius:4px; padding:0 3px}}
-@media (max-width:820px) {{ .cm-hero {{grid-template-columns:1fr}} .cm-greet h1 {{font-size:1.6rem}} .cm-eta {{font-size:2rem}}
-  .block-container {{padding:.8rem .6rem}} }}
+/* منع أي خروج عن عرض الشاشة */
+html, body, .stApp {{overflow-x:hidden}}
+.cm-card, .cm-title, .cm-body, .cm-sm, .cm-pill, .cm-nt, .cm-chip {{overflow-wrap:anywhere; word-break:break-word}}
+.cm-chip {{white-space:normal}}
+a {{overflow-wrap:anywhere}}
+
+/* تابلت وموبايل */
+@media (max-width:820px) {{
+  .cm-hero {{grid-template-columns:1fr}}
+  .cm-next {{order:-1}}
+  .block-container {{padding:.8rem .7rem 4rem}}
+}}
+@media (max-width:640px) {{
+  .cm-greet {{padding:16px 18px; border-radius:20px}}
+  .cm-greet h1 {{font-size:1.5rem}}
+  .cm-greet .cm-sub {{margin-bottom:8px}}
+  .cm-next {{padding:16px 18px; border-radius:20px}}
+  .cm-eta {{font-size:2rem}}
+  .cm-next .cm-nt {{font-size:1rem}}
+  .cm-tiles {{grid-template-columns:repeat(3,1fr); gap:8px}}
+  .cm-tile {{padding:10px 10px; border-radius:14px}}
+  .cm-tile .n {{font-size:1.35rem}} .cm-tile .l {{font-size:.72rem}} .cm-tile .i {{font-size:1rem}}
+  .cm-card {{padding:12px 14px; border-radius:16px}}
+  .cm-card:hover {{transform:none}}
+  .cm-body {{font-size:.98rem; line-height:1.8}}
+  .cm-title {{font-size:1rem}}
+  .cm-chip {{font-size:.74rem; padding:2px 9px}}
+  .cm-day {{font-size:1rem; margin:16px 0 8px}}
+  /* الأسبوع: أيام فوق بعض بدل 7 أعمدة، والأيام الفاضية مخفية */
+  .cm-weekwrap {{overflow:visible}}
+  .cm-week {{grid-template-columns:1fr; min-width:0; gap:8px}}
+  .cm-col {{min-height:0; padding:10px 12px}}
+  .cm-col.empty {{display:none}}
+  .cm-pill {{font-size:.82rem}}
+  /* التابات: شريط بيتسحب أفقيًا بدل ما يتلف سطور */
+  .stTabs [data-baseweb="tab-list"] {{flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none}}
+  .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar {{display:none}}
+  .stTabs [data-baseweb="tab"] {{padding:8px 11px; white-space:nowrap; flex:0 0 auto}}
+  /* أهداف لمس مريحة */
+  .stButton > button, .stDownloadButton > button {{min-height:46px}}
+  .stCheckbox label, .stToggle label {{min-height:40px}}
+  [data-testid="stMetric"] {{padding:8px 10px}}
+  [data-baseweb="input"] input, textarea {{font-size:16px !important}}  /* يمنع زوم iOS */
+  h3 {{font-size:1.2rem !important}}
+}}
 </style>
 """
 
